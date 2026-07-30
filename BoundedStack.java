@@ -16,8 +16,8 @@ public class BoundedStack{
     //   -มีประวัติการค้นหาอยู่จริงไม่เป็น null
     //   -ชื่อประวัติการค้นหาต้องไม่ซ้ำ
     //   -มีได้สูงสุด 100 ประวัติการค้นหาไม่ > 100
-    //   -ประวัติการค้นหาไม่เป็น null
-    //   -ประวัติการค้นหามีเขียนไม่ปล่อยว่าง
+    //   -ชื่อประวัติการค้นหาไม่เป็น null
+    //   -ชื่อประวัติการค้นหามีเขียนไม่ปล่อยว่าง
 
     //
     // Safety from rep exposure:
@@ -55,7 +55,8 @@ public class BoundedStack{
      /**
       * สร้างลิสต์จากรายการที่ค้นหา
       * 
-      * @param 
+      * @param initial รายชื่อการค้นหาเริ่มต้น ต้องไม่ซ้ำและไม่เกิน capacity
+      * @throws IllegalArgumentException ถ้า initial ผิดเงื่อนไข
       */
 
 
@@ -64,23 +65,47 @@ public class BoundedStack{
 
 
      // ===== Mutators =====
-
-
+     /**
+     * เพิ่มรายการค้นหาต่อท้ายลิสต์
+     *
+     * @param search ชื่อประวัติการค้นหาไม่เป็น null และมีเขียนไม่ปล่อยว่าง
+     * @return true ถ้าเพิ่มสำเร็จ, false ถ้ามีคำค้นหานี้อยู่แล้วหรือเต็มแล้ว
+     * @throws IllegalArgumentException ถ้า search เป็น null หรือข้อความว่าง
+     */
+    public boolean add(String search) {
+        return false;   // แก้บรรทัดนี้
+    }
+     /**
+     *   ลบรายการค้นหาในประวัติออกจากลิสต์
+     *
+     * @param search คำค้นหาที่ต้องการลบ
+     * @return true ถ้าลบสำเร็จ, false ถ้าไม่พบคำค้นหานี้
+     */
+    public boolean remove(String search) {
+        return false;   // แก้บรรทัดนี้
+    }
      // ===== Observers =====
     /**
-     * คืนจำนวนจำนวนการค้นหาในประวัติ
+     * คืนจำนวนการค้นหาในประวัติ
+     * 
+     * @return จำนวนการค้นหาในประวัติ
      */
     public int size() {
         return searchs.size();
     }
     /**
-     * ตรวจว่ามีเพลงนี้อยู่หรือไม่
+     * ตรวจว่ามีคำที่ค้นหานี้เคยค้นหามาก่อนหรือไม่
+     * 
+     * @param search คำค้นหาที่ต้องการตรวจสอบ
+     * @return true หากมีคำค้นหาอยู่ในประวัติ, false หากไม่มี
      */
     public boolean contains(String search) {
         return searchs.contains(search);  
     }
     /**
-     * คืนรายชื่อเพลงทั้งหมดตามลำดับ
+     * คืนรายการการค้นหาตามลำดับ
+     * 
+     * @return สำเนาของรายการค้นหาในประวัติ
      */
     public List<String> searchs() {
         return new ArrayList<>(searchs);   // แก้บรรทัดนี้
@@ -88,5 +113,11 @@ public class BoundedStack{
 
 
      // ===== Producer =====
+
+     /**
+      * คืนรายการคำค้นหาเรียงจากเก่าสุดไปล่าสุด
+      * 
+      * @return สำเนาของประวัติการค้นหาเรียงจากเก่าสุดไปล่าสุด
+      */
 
 }
