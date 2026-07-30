@@ -10,14 +10,14 @@ public class BoundedStack{
      // ===== representation =====
 
     private final List<String> searchs; //AF(search) = ลำดับประวัติการค้นหา 
-    private  final int capacity;
+    private  final int capacity = 10;
 
     // Representation Invariant:
     //   -มีประวัติการค้นหาอยู่จริงไม่เป็น null
     //   -ชื่อประวัติการค้นหาต้องไม่ซ้ำ
-    //   -มีได้สูงสุด 100 ประวัติการค้นหาไม่ > 100
-    //   -ชื่อประวัติการค้นหาไม่เป็น null
-    //   -ชื่อประวัติการค้นหามีเขียนไม่ปล่อยว่าง
+    //   -มีได้สูงสุด 10 ประวัติการค้นหาไม่ > 10
+    //   -ประวัติการค้นหาไม่เป็น null
+    //   -ประวัติการค้นหามีเขียนไม่ปล่อยว่าง
 
     //
     // Safety from rep exposure:
@@ -27,16 +27,13 @@ public class BoundedStack{
      * 
      * @param capacity จำนวนที่สามารถเก็บประวัติการค้นหาได้
      */
-    public BoundedStack(int capacity){
-        this.searchs = new ArrayList<>();
-        this.capacity = capacity;
-
+    
          
-        }
+        
 
     private void checkRep(){
         assert searchs != null : "searchs not null";
-        assert searchs.size() <= capacity : "Songs not over 100 ";
+        assert searchs.size() <= capacity : "Songs not over 10 ";
 
         Set<String> seen = new HashSet<>();
         for(String s : searchs){
@@ -51,61 +48,75 @@ public class BoundedStack{
      /**
       * สร้างประวัติการค้นหาว่าง
       */
+     public BoundedStack(){
+        this.searchs = new ArrayList<>();
+        checkRep();
+     }
 
      /**
       * สร้างลิสต์จากรายการที่ค้นหา
       * 
-      * @param initial รายชื่อการค้นหาเริ่มต้น ต้องไม่ซ้ำและไม่เกิน capacity
+      * @param initial รายชื่อการค้นหาเริ่มต้น ต้องไม่ซ้ำ และไม่เกิน capacity
       * @throws IllegalArgumentException ถ้า initial ผิดเงื่อนไข
       */
-
-
-
-    
-
+     public BoundedStack(List<String> initial){
+        if(initial == null) throw new IllegalArgumentException();
+        if(initial.size() > capacity)throw new IllegalArgumentException();
+        Set<String> seen = new HashSet<>();
+        for(String s : initial){
+            if(s==null||s=="")throw new IllegalArgumentException();
+            if(!seen.add(s))throw new IllegalArgumentException();
+        }
+        this.searchs = new ArrayList<>(initial);  
+        checkRep(); 
+     }
 
      // ===== Mutators =====
      /**
-     * เพิ่มรายการค้นหาต่อท้ายลิสต์
-     *
-     * @param search ชื่อประวัติการค้นหาไม่เป็น null และมีเขียนไม่ปล่อยว่าง
-     * @return true ถ้าเพิ่มสำเร็จ, false ถ้ามีคำค้นหานี้อยู่แล้วหรือเต็มแล้ว
-     * @throws IllegalArgumentException ถ้า search เป็น null หรือข้อความว่าง
-     */
-    public boolean add(String search) {
-        return false;   // แก้บรรทัดนี้
-    }
+      * เพิ่มการค้นหาล่าสุดไว้บนประวัติกรค้นหา
+      * 
+      * @param search การค้นหา ต้องไม่เป็น null และไม่เป็นสตริงว่าง
+      * @return true ถ้าเพิ่มสำเร็จ, false ถ้ามีการค้นหานี้อยู่แล้วหรือเต็มแล้ว
+      * @throws IllegalArgumentException ถ้า search เป็น null หรือสตริงว่าง
+      */
+     public boolean add(String search){
+        if(search == null || search.isEmpty())throw new IllegalArgumentException();
+        if(searchs.contains(search)||searchs.size() == capacity) return false;
+
+        searchs.add(0,search); // เพิ่มไว้หน้าสุด
+
+        checkRep();
+        return true;
+     }
      /**
-     *   ลบรายการค้นหาในประวัติออกจากลิสต์
-     *
-     * @param search คำค้นหาที่ต้องการลบ
-     * @return true ถ้าลบสำเร็จ, false ถ้าไม่พบคำค้นหานี้
-     */
-    public boolean remove(String search) {
-        return false;   // แก้บรรทัดนี้
-    }
+      * ลบการค้นหาออกจากประวัติการค้นหา
+      * @param search ชื่อประวัติการค้นหาที่ต้องการลบ
+      * @return  ถ้าลบสำเร็จ, false ถ้าไม่พบการค้นหานี้
+      */
+     public boolean remove(String search){
+         if(!searchs.contains(search)) return false;
+        searchs.remove(search);
+
+        checkRep();
+        return true;
+
+     }
+
      // ===== Observers =====
     /**
-     * คืนจำนวนการค้นหาในประวัติ
-     * 
-     * @return จำนวนการค้นหาในประวัติ
+     * คืนจำนวนจำนวนการค้นหาในประวัติ
      */
     public int size() {
         return searchs.size();
     }
     /**
-     * ตรวจว่ามีคำที่ค้นหานี้เคยค้นหามาก่อนหรือไม่
-     * 
-     * @param search คำค้นหาที่ต้องการตรวจสอบ
-     * @return true หากมีคำค้นหาอยู่ในประวัติ, false หากไม่มี
+     * ตรวจว่ามีการค้นหานี้อยู่หรือไม่
      */
     public boolean contains(String search) {
         return searchs.contains(search);  
     }
     /**
-     * คืนรายการการค้นหาตามลำดับ
-     * 
-     * @return สำเนาของรายการค้นหาในประวัติ
+     * คืนรายชื่อการค้นหาทั้งหมดตามลำดับ
      */
     public List<String> searchs() {
         return new ArrayList<>(searchs);   // แก้บรรทัดนี้
@@ -114,10 +125,5 @@ public class BoundedStack{
 
      // ===== Producer =====
 
-     /**
-      * คืนรายการคำค้นหาเรียงจากเก่าสุดไปล่าสุด
-      * 
-      * @return สำเนาของประวัติการค้นหาเรียงจากเก่าสุดไปล่าสุด
-      */
 
 }

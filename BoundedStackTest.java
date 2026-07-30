@@ -24,7 +24,7 @@ public class BoundedStackTest{
         assert assertsOn = true;
         if (!assertsOn) {
             System.out.println("WARNING: assertions disabled"
-                    + " - re-run with: java -ea PlaylistTest\n");
+                    + " - re-run with: java -ea BoundedStackTest\n");
         }
 
         System.out.println("=== Playlist Test Suite ===\n");
@@ -46,7 +46,20 @@ public class BoundedStackTest{
             System.exit(1);
         }
     }
-    private static void testCreators(){}
+
+    // --- Partition: ว่าง / มีการค้นหา / input ที่ผิดเงื่อนไข ---
+    private static void testCreators(){
+        System.out.println("-- Creators --");
+
+        BoundedStack empty = new BoundedStack();
+        check("new() -> empty", empty.size() == 0);
+        
+
+        
+
+
+
+    }
     private static void testAdd(){}
     private static void testRemove(){}
     private static void testObservers(){}
