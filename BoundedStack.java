@@ -1,5 +1,4 @@
 import java.util.*;
-
 /**
  * 
  * BoundedStack - ADT แทนการประวัติการค้นหา
@@ -9,8 +8,8 @@ import java.util.*;
 public class BoundedStack{
      // ===== representation =====
 
-    private final List<String> searchs; //AF(search) = ลำดับประวัติการค้นหา 
-    private  final int capacity = 10;
+    private  final List<String> searchs; //AF(search) = ลำดับประวัติการค้นหา 
+    public static final int capacity = 10;
 
     // Representation Invariant:
     //   -มีประวัติการค้นหาอยู่จริงไม่เป็น null
@@ -22,13 +21,9 @@ public class BoundedStack{
     //
     // Safety from rep exposure:
     //    -capacity เป็น private final    
-
     /**
     * @param capacity จำนวนที่สามารถเก็บประวัติการค้นหาได้
     */
-   
-
-
     private void checkRep(){
         assert searchs != null : "searchs not null";
         assert searchs.size() <= capacity : "searchs not over 10 ";
@@ -40,8 +35,6 @@ public class BoundedStack{
             assert !(s=="") :"searchs is ว่าง";
         }
     }
-    
-
      // ===== Creator =====
      /**
       * สร้างประวัติการค้นหาว่าง
@@ -50,7 +43,6 @@ public class BoundedStack{
         this.searchs = new ArrayList<>();
         checkRep();
      }
-
      /**
       * สร้างลิสต์จากรายการที่ค้นหา
       * 
@@ -68,7 +60,6 @@ public class BoundedStack{
         this.searchs = new ArrayList<>(initial);  
         checkRep(); 
      }
-
      // ===== Mutators =====
      /**
       * เพิ่มการค้นหาล่าสุดไว้บนประวัติกรค้นหา
@@ -104,7 +95,6 @@ public class BoundedStack{
 
         checkRep();
         return true;
-
      }
 
      // ===== Observers =====
@@ -133,8 +123,6 @@ public class BoundedStack{
     public List<String> searchs() {
         return new ArrayList<>(searchs);   // แก้บรรทัดนี้
     }
-
-
      // ===== Producer =====
       /**
       * คืนรายการคำค้นหาเรียงจากเก่าสุดไปล่าสุด
@@ -150,7 +138,4 @@ public class BoundedStack{
      public String toString(){
         return searchs.toString();
      }
-
-
-
 }
