@@ -27,7 +27,7 @@ public class BoundedStackTest{
                     + " - re-run with: java -ea BoundedStackTest\n");
         }
 
-        System.out.println("=== Playlist Test Suite ===\n");
+        System.out.println("=== BoundedStack Test Suite ===\n");
 
         testCreators();
         testAdd();
@@ -56,10 +56,9 @@ public class BoundedStackTest{
         check("new() -> contains nothing", !empty.contains("anything"));//ตรวจสอบว่าไม่การค้นหา เพราะรายการที่สร้างใหม่ไม่ควรมีคำค้นหาใดๆ
         
         BoundedStack b = new BoundedStack(Arrays.asList("X","1+5","พ่อ"));
-        check("new(list) -> size 3", b.size() == 3);
-        check("new(list) -> contains X", b.contains("X"));
+        check("new(list) -> contains X", b.contains("X"));//มีคำค้นหา X อยู่ในรายการ
         check("new(list) -> preserves order",
-                b.searchs().equals(Arrays.asList("X", "1+5", "พ่อ")));
+                b.searchs().equals(Arrays.asList("X", "1+5", "พ่อ"))); //เรียงลำดับถูกต้อง
         
 
 
@@ -121,7 +120,7 @@ public class BoundedStackTest{
             threwNull = true;
         }
         check("add(null) -> throws IllegalArgumentException", threwNull);
-        check("failed adds leave playlist unchanged", b.size() == 3);
+        check("failed adds leave Boundedstack unchanged", b.size() == 3);
 
         // : boundary: เติมจนเต็มพอดีแล้วเติมเพิ่ม
         BoundedStack full = new BoundedStack();
@@ -148,6 +147,7 @@ public class BoundedStackTest{
         b.remove("X");
         b.remove("พ่อ");
         check("remove all -> empty", b.size() == 0);
+        check("remove on empty BoundedStack -> returns false", !b.remove("X"));
     }
 
     // --- Observer ต้องไม่มีผลกระทบ ---
@@ -171,7 +171,7 @@ public class BoundedStackTest{
         BoundedStack original = new BoundedStack(Arrays.asList("X", "1+5", "พ่อ", "j3k"));
         BoundedStack reverse = original.reverse();
 
-        check("reverse has the same size", reverse.size() == reverse.size());
+        check("reverse has the same size", reverse.size() == original.size()); //หลังสลับขนาดเท่ากัน
 
         List<String> a = new ArrayList<String>(original.searchs());
         List<String> b = new ArrayList<String>(reverse.searchs());
@@ -179,18 +179,52 @@ public class BoundedStackTest{
         Collections.sort(b);
 
         check("reverse contains exactly the same search", a.equals(b));//มีรายการเหมือนกัน
-        check("reverse does not mutate the original",original.searchs().equals(Arrays.asList("X", "1+5", "พ่อ", "j3k")));
-
+        check("reverse does not mutate the original",original.searchs().equals(Arrays.asList("X", "1+5", "พ่อ", "j3k")));//สลับแล้วไม่มีผลกระทบของเดิม
+        check("reverse changes order",
+                    reverse.searchs().equals(Arrays.asList("j3k","พ่อ","1+5","X")));//สลับเก่าไปใหม่ จริงไหม
         // mutate ตัวใหม่ต้องไม่กระทบตัวเดิม
         reverse.add("Hayai");
         check("mutating the result does not affect the original",original.size() == 4);
 
         // boundary: reverse รายการว่างต้องไม่พัง
-         BoundedStack emptyShuffled = new BoundedStack().reverse();
-        check("reverse an empty BoundedStack is safe", emptyShuffled.size() == 0);
+         BoundedStack emptyReversed = new BoundedStack().reverse();
+        check("reverse an empty BoundedStack is safe", emptyReversed.size() == 0);
 
     }
 
-    private static void testExposure(){}
+    private static void testExposure(){
+                System.out.println("\n-- Representation Exposure --");
+
+        // ขาออก: แก้ list ที่ได้จาก searchs() ต้องไม่กระทบ rep
+        BoundedStack s = new BoundedStack();
+        s.add("X");
+
+        List<String> got = s.searchs();
+        got.clear();
+        check("clearing result of searchs() does not affect BoundedStack",
+                s.size() == 1); //รายการค้นหาเดิมยังมี 1 รายการ
+
+        got = s.searchs();
+        got.add("injected");
+        check("adding to result of searchs() does not affect BoundedStack",
+                s.size() == 1 && !s.contains("injected")); //ยังมี 1 รายการและไม่มี injected ในรายการค้นหา
+
+        // สองครั้งต้องเป็นคนละ object
+        check("searchs() returns a fresh list each call",
+                s.searchs() != s.searchs()); //searchs() คืน List ใหม่ทุกครั้ง
+
+        // ขาเข้า: แก้ list ที่ส่งให้ constructor ต้องไม่กระทบ rep
+        List<String> input = new ArrayList<String>(Arrays.asList("A", "B"));
+        BoundedStack b = new BoundedStack(input);
+
+        input.clear();
+        check("clearing constructor argument does not affect BoundedStack",
+                b.size() == 2); //ยังมีอยู่ 2 รายการ copy มาไม่ได้เก็บใน List ผู้ใช้
+
+        input.add("injected");
+        check("adding to constructor argument does not affect BoundedStack",
+                !b.contains("injected")); //เพิ่ม injected ใน List ของเดิมไม่เปลี่ยน
+
+    }
 
 }

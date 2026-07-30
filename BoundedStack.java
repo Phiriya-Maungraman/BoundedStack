@@ -20,7 +20,7 @@ public class BoundedStack{
 
     //
     // Safety from rep exposure:
-    //    -capacity เป็น private final    
+    //    -capacity เป็น final  คนใช้แก้ไม่ได้
     /**
     * @param capacity จำนวนที่สามารถเก็บประวัติการค้นหาได้
     */
@@ -65,7 +65,7 @@ public class BoundedStack{
       * เพิ่มการค้นหาล่าสุดไว้บนประวัติกรค้นหา
       * 
       * @param search การค้นหา ต้องไม่เป็น null และไม่เป็นสตริงว่าง
-      * @return true ถ้าเพิ่มสำเร็จและลบคำซ้ำไปอยุู่ล่าสุด, false ถ้าคำค้นหาเต็มแล้ว
+      * @return true ถ้าเพิ่มคำค้นหาใหม่หรือย้ายคำค้นหาซ้ำสำเร็จ, false ถ้าคำค้นหาเต็มแล้ว
       * @throws IllegalArgumentException ถ้า search เป็น null หรือสตริงว่าง
       */
      public boolean add(String search){
