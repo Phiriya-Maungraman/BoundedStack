@@ -74,12 +74,19 @@ public class BoundedStack{
       * เพิ่มการค้นหาล่าสุดไว้บนประวัติกรค้นหา
       * 
       * @param search การค้นหา ต้องไม่เป็น null และไม่เป็นสตริงว่าง
-      * @return true ถ้าเพิ่มสำเร็จ, false ถ้ามีการค้นหานี้อยู่แล้วหรือเต็มแล้ว
+      * @return true ถ้าเพิ่มสำเร็จและลบคำซ้ำไปอยุู่ล่าสุด, false ถ้าคำค้นหาเต็มแล้ว
       * @throws IllegalArgumentException ถ้า search เป็น null หรือสตริงว่าง
       */
      public boolean add(String search){
         if(search == null || search.isEmpty())throw new IllegalArgumentException();
-        if(searchs.contains(search)||searchs.size() == capacity) return false;
+        if(searchs.contains(search)){//ถ้าคำค้นหาซ้ำ
+            searchs.remove(search); //ลบตัวเก่าออกจากตำแหน่งเดิม
+            searchs.add(0,search);//เพิ่มกลับไปตำแหน่งล่าสุด
+            checkRep();
+            return true;
+        }
+
+        if (searchs.size() == capacity) return false;
 
         searchs.add(0,search); // เพิ่มไว้หน้าสุด
 
