@@ -51,8 +51,25 @@ public class BoundedStackTest{
     private static void testCreators(){
         System.out.println("-- Creators --");
 
-        BoundedStack empty = new BoundedStack();
-        check("new() -> empty", empty.size() == 0);
+        BoundedStack empty = new BoundedStack();//สร้างรายการใหม่
+        check("new() -> empty", empty.size() == 0);//ตรวจสอบว่าจำนวนการค้นหาเป็น 0
+        check("new() -> contains nothing", !empty.contains("anything"));//ตรวจสอบว่าไม่การค้นหา เพราะรายการที่สร้างใหม่ไม่ควรมีคำค้นหาใดๆ
+        
+        BoundedStack b = new BoundedStack(Arrays.asList("X","1+5","พ่อ"));
+        check("new(list) -> size 3", b.size() == 3);
+        check("new(list) -> contains X", b.contains("X"));
+        check("new(list) -> preserves order",
+                b.searchs().equals(Arrays.asList("X", "1+5", "พ่อ")));
+
+
+        boolean threwDup = false;
+        try {
+            new BoundedStack(Arrays.asList("X", "X"));
+        } catch (IllegalArgumentException e) {
+            threwDup = true;
+        }
+
+
         
 
         

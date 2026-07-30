@@ -24,22 +24,20 @@ public class BoundedStack{
     //    -capacity เป็น private final    
 
     /**
-     * 
-     * @param capacity จำนวนที่สามารถเก็บประวัติการค้นหาได้
-     */
-    
-         
-        
+    * @param capacity จำนวนที่สามารถเก็บประวัติการค้นหาได้
+    */
+   
+
 
     private void checkRep(){
         assert searchs != null : "searchs not null";
-        assert searchs.size() <= capacity : "Songs not over 10 ";
+        assert searchs.size() <= capacity : "searchs not over 10 ";
 
         Set<String> seen = new HashSet<>();
         for(String s : searchs){
             assert seen.add(s) : "ค้นหาซ้ำ"+s;
-            assert s!=null :"search is null";   
-            assert !(s=="") :"sea is ว่าง";
+            assert s!=null :"searchs is null";   
+            assert !(s=="") :"searchs is ว่าง";
         }
     }
     
@@ -105,18 +103,25 @@ public class BoundedStack{
      // ===== Observers =====
     /**
      * คืนจำนวนจำนวนการค้นหาในประวัติ
+     * 
+     *  @return จำนวนการค้นหาในประวัติ
      */
     public int size() {
         return searchs.size();
     }
     /**
-     * ตรวจว่ามีการค้นหานี้อยู่หรือไม่
+     * ตรวจว่ามีคำที่ค้นหานี้เคยค้นหามาก่อนหรือไม่
+     * 
+     * @param search คำค้นหาที่ต้องการตรวจสอบ
+     * @return รายการที่เคยค้นหา
      */
     public boolean contains(String search) {
         return searchs.contains(search);  
     }
     /**
-     * คืนรายชื่อการค้นหาทั้งหมดตามลำดับ
+     * คืนรายการการค้นหาตามลำดับ
+     * 
+     * @return สำเนาของรายการค้นหาในประวัติ
      */
     public List<String> searchs() {
         return new ArrayList<>(searchs);   // แก้บรรทัดนี้
@@ -124,6 +129,21 @@ public class BoundedStack{
 
 
      // ===== Producer =====
+      /**
+      * คืนรายการคำค้นหาเรียงจากเก่าสุดไปล่าสุด
+      * 
+      * @return สำเนาของประวัติการค้นหาเรียงจากเก่าสุดไปล่าสุด
+      */
+     public BoundedStack reverse(){
+        List<String> copy = new ArrayList<>(searchs);
+        Collections.reverse(copy);
+        return new BoundedStack(copy);
+
+     }
+     public String toString(){
+        return searchs.toString();
+     }
+
 
 
 }
