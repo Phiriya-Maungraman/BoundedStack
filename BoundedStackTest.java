@@ -1,14 +1,14 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import java.util.*;
+//รายชื่อสมาชิก
+//6821601305 พิริยะ เมืองรามัญ เลขที่ 41	
+//6821601500 ศุภณัฐ สุริยะ เลขที่ 61
 /**
  * Test runner 
  */
 public class BoundedStackTest{
     private static int passed = 0;
     private static int failed = 0;
+    
 
 
     /** ตัวช่วยกลางในการพิมพ์ PASS/FAIL และนับผลให้เอง */
@@ -22,8 +22,212 @@ public class BoundedStackTest{
         }
 
     }
-    
+    public static void main(String[] args) {
+        boolean assertsOn = false;
+        assert assertsOn = true;
+        if (!assertsOn) {
+            System.out.println("WARNING: assertions disabled"
+                    + " - re-run with: java -ea BoundedStackTest\n");
+        }
+
+        System.out.println("=== BoundedStack Test Suite ===\n");
+
+        testCreators();
+        testAdd();
+        testRemove();
+        testObservers();
+        testProducer();
+        testExposure();
+
+        System.out.println("\n=== Summary ===");
+        System.out.println("Passed: " + passed);
+        System.out.println("Failed: " + failed);
+        System.out.println("Total : " + (passed + failed));
+        System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+
+        if (failed > 0) {
+            System.exit(1);
+        }
+    }
+
+    // --- Partition: ว่าง / มีการค้นหา / input ที่ผิดเงื่อนไข ---
+    private static void testCreators(){
+        System.out.println("-- Creators --");
+
+        BoundedStack empty = new BoundedStack();//สร้างรายการใหม่
+        check("new() -> empty", empty.size() == 0);//ตรวจสอบว่าจำนวนการค้นหาเป็น 0
+        check("new() -> contains nothing", !empty.contains("anything"));//ตรวจสอบว่าไม่การค้นหา เพราะรายการที่สร้างใหม่ไม่ควรมีคำค้นหาใดๆ
+        
+        BoundedStack b = new BoundedStack(Arrays.asList("X","1+5","พ่อ"));
+        check("new(list) -> contains X", b.contains("X"));//มีคำค้นหา X อยู่ในรายการ
+        check("new(list) -> preserves order",
+                b.searchs().equals(Arrays.asList("X", "1+5", "พ่อ"))); //เรียงลำดับถูกต้อง
+        
 
 
+        boolean threwDup = false; //คำซ้ำ
+        try {
+            new BoundedStack(Arrays.asList("X", "X"));
+        } catch (IllegalArgumentException e) {
+            threwDup = true;
+        }
+        check("new(duplicates) -> throws IllegalArgumentException" , threwDup);
+
+        boolean threwNull = false; //คำเป็น Null
+        try{
+            new BoundedStack(Arrays.asList("X",null));
+        } catch (IllegalArgumentException e) {
+            threwNull = true;
+        }
+        check("new(list with null) -> throws IllegalArgumentException", threwNull);
+
+        boolean threwnullList = false; //ลิสต์เป็น null
+        try{
+            new BoundedStack(null);
+        } catch (IllegalArgumentException e){
+            threwnullList = true;
+        }
+        check("new(null) -> throws IllegalArgumentException", threwnullList);
+
+    }
+      // --- Mutator: add ต้องรักษาลำดับและเพลงซ้ำต้องลบแล้วไปอยุ่ล่าสุด ---
+    private static void testAdd(){
+        System.out.println("\n-- Add --");
+        BoundedStack b = new BoundedStack();
+        check("add(X)-> returns true", b.add("X"));//ตรวจสอบเพิ่มรายการค้นหา X สำเร็จไหม
+        check("add(X) -> size 1", b.size()==1);//ตรวจสอบการค้นหามี 1 รายการไหม
+        check("add(X) -> found by contains", b.contains("X"));//ตรวจสอบมีคำค้นหา X ไหม
+        b.add("1+5");
+        b.add("พ่อ");
+        check("add preserves insertion order",
+            b.searchs().equals(Arrays.asList("พ่อ","1+5","X")));//คำค้นหาใหม่จะอยู่ด้านหน้า
+        b.add("1+5");
+        check("add duplicate insertion order",
+            b.searchs().equals(Arrays.asList("1+5","พ่อ","X")));//คำค้นหาซ้ำต้องถูกลบแล้วเลื่อนไปอยู่หน้าสุด
+        check("dupiclate search no size changed", b.size() == 3);//คำค้นหาซ้ำมีขนาดเท่าเดิม
+
+        boolean threwEmpty = false;
+        try {
+            b.add("");
+        } catch (IllegalArgumentException e) {
+            threwEmpty = true;
+        }
+        check("add(empty string) -> throws IllegalArgumentException", threwEmpty);
+
+
+        // input ที่ผิดเงื่อนไขต้องโยน exception
+        boolean threwNull = false;
+        try {
+            b.add(null);
+        } catch (IllegalArgumentException e) {
+            threwNull = true;
+        }
+        check("add(null) -> throws IllegalArgumentException", threwNull);
+        check("failed adds leave Boundedstack unchanged", b.size() == 3);
+
+        // : boundary: เติมจนเต็มพอดีแล้วเติมเพิ่ม
+        BoundedStack full = new BoundedStack();
+        for (int i = 0; i < full.getCapacity(); i++) {
+            full.add("search"+i);             
+        }
+        check("can fill up to capacity", full.size() == full.getCapacity());//สามารถเติมจนเต็ม capacity
+        check("add when full -> returns false", !full.add("one more"));//เพิ่มเมื่อมีขนาดเต็มจะส่ง false กลับ
+    }
+
+    // --- Mutator: remove ทั้งกรณีพบและไม่พบ ---
+    private static void testRemove(){
+        System.out.println("\n-- Remove --");
+        BoundedStack b = new BoundedStack(Arrays.asList("X", "1+5", "พ่อ"));
+        check("remove(B) -> returns true", b.remove("1+5"));//ลบสำเร็จไหม
+        check("remove -> size decreases", b.size() == 2);//ลบแล้วขนาดลดลงไหม
+        check("remove -> search is gone", !b.contains("1+5"));//คำค้นหานี้ไม่ได้อยู่ในรายการ
+        check("remove keeps the others in order",b.searchs().equals(Arrays.asList("X", "พ่อ")));//ยังมีรายการที่เรายังไม่เหลืออยู่
+
+        // ลบรายการที่ไม่มีไม่ใช่ error คืน false
+        check("remove missing song -> returns false", !b.remove("J3k"));//ลบคำที่ไมมีอยู่ในรายการ
+
+        // boundary: ลบจนหมด
+        b.remove("X");
+        b.remove("พ่อ");
+        check("remove all -> empty", b.size() == 0);
+        check("remove on empty BoundedStack -> returns false", !b.remove("X"));
+    }
+
+    // --- Observer ต้องไม่มีผลกระทบ ---
+    private static void testObservers(){
+        System.out.println("\n-- Observers --");
+        BoundedStack b = new BoundedStack(Arrays.asList("X", "1+5"));
+        check("size reports 2", b.size() == 2);
+        check("contains rejects a missing search", !b.contains("j3k"));
+        check("songs returns the full list in order",b.searchs().equals(Arrays.asList("X", "1+5")));
+
+        int before = b.size();
+        b.size();
+        b.contains("b");
+        b.searchs();
+        check("observers have no side effects", b.size() == before);//ข้อมูลที่ส่งไม่มีผลกระทบ
+
+
+    }
+    private static void testProducer(){
+        System.out.println("\n-- Producer (reverse) --");
+        BoundedStack original = new BoundedStack(Arrays.asList("X", "1+5", "พ่อ", "j3k"));
+        BoundedStack reverse = original.reverse();
+
+        check("reverse has the same size", reverse.size() == original.size()); //หลังสลับขนาดเท่ากัน
+
+        List<String> a = new ArrayList<String>(original.searchs());
+        List<String> b = new ArrayList<String>(reverse.searchs());
+        Collections.sort(a);
+        Collections.sort(b);
+
+        check("reverse contains exactly the same search", a.equals(b));//มีรายการเหมือนกัน
+        check("reverse does not mutate the original",original.searchs().equals(Arrays.asList("X", "1+5", "พ่อ", "j3k")));//สลับแล้วไม่มีผลกระทบของเดิม
+        check("reverse changes order",
+                    reverse.searchs().equals(Arrays.asList("j3k","พ่อ","1+5","X")));//สลับเก่าไปใหม่ จริงไหม
+        // mutate ตัวใหม่ต้องไม่กระทบตัวเดิม
+        reverse.add("Hayai");
+        check("mutating the result does not affect the original",original.size() == 4);
+
+        // boundary: reverse รายการว่างต้องไม่พัง
+         BoundedStack emptyReversed = new BoundedStack().reverse();
+        check("reverse an empty BoundedStack is safe", emptyReversed.size() == 0);
+
+    }
+
+    private static void testExposure(){
+                System.out.println("\n-- Representation Exposure --");
+
+        // ขาออก: แก้ list ที่ได้จาก searchs() ต้องไม่กระทบ rep
+        BoundedStack s = new BoundedStack();
+        s.add("X");
+
+        List<String> got = s.searchs();
+        got.clear();
+        check("clearing result of searchs() does not affect BoundedStack",
+                s.size() == 1); //รายการค้นหาเดิมยังมี 1 รายการ
+
+        got = s.searchs();
+        got.add("injected");
+        check("adding to result of searchs() does not affect BoundedStack",
+                s.size() == 1 && !s.contains("injected")); //ยังมี 1 รายการและไม่มี injected ในรายการค้นหา
+
+        // สองครั้งต้องเป็นคนละ object
+        check("searchs() returns a fresh list each call",
+                s.searchs() != s.searchs()); //searchs() คืน List ใหม่ทุกครั้ง
+
+        // ขาเข้า: แก้ list ที่ส่งให้ constructor ต้องไม่กระทบ rep
+        List<String> input = new ArrayList<String>(Arrays.asList("A", "B"));
+        BoundedStack b = new BoundedStack(input);
+
+        input.clear();
+        check("clearing constructor argument does not affect BoundedStack",
+                b.size() == 2); //ยังมีอยู่ 2 รายการ copy มาไม่ได้เก็บใน List ผู้ใช้
+
+        input.add("injected");
+        check("adding to constructor argument does not affect BoundedStack",
+                !b.contains("injected")); //เพิ่ม injected ใน List ของเดิมไม่เปลี่ยน
+
+    }
 
 }
