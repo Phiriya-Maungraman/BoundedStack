@@ -1,4 +1,7 @@
 import java.util.*;
+//รายชื่อสมาฃิก
+//6821601305 พิริยะ เมืองรามัญ เลขที่ 41	
+//6821601500 ศุภณัฐ สุริยะ เลขที่ 61 
 /**
  * 
  * BoundedStack - ADT แทนการประวัติการค้นหา
@@ -9,7 +12,7 @@ public class BoundedStack{
      // ===== representation =====
 
     private  final List<String> searchs; //AF(search) = ลำดับประวัติการค้นหา 
-    public static final int capacity = 10;
+    private static  final int capacity = 10 ;
 
     // Representation Invariant:
     //   -มีประวัติการค้นหาอยู่จริงไม่เป็น null
@@ -43,6 +46,11 @@ public class BoundedStack{
         this.searchs = new ArrayList<>();
         checkRep();
      }
+     public int getCapacity() {
+        return capacity;
+    }
+    
+
      /**
       * สร้างลิสต์จากรายการที่ค้นหา
       * 

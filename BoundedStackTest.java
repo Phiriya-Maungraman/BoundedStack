@@ -1,11 +1,14 @@
 import java.util.*;
-
+//รายชื่อสมาชิก
+//6821601305 พิริยะ เมืองรามัญ เลขที่ 41	
+//6821601500 ศุภณัฐ สุริยะ เลขที่ 61
 /**
  * Test runner 
  */
 public class BoundedStackTest{
     private static int passed = 0;
     private static int failed = 0;
+    
 
 
     /** ตัวช่วยกลางในการพิมพ์ PASS/FAIL และนับผลให้เอง */
@@ -124,10 +127,10 @@ public class BoundedStackTest{
 
         // : boundary: เติมจนเต็มพอดีแล้วเติมเพิ่ม
         BoundedStack full = new BoundedStack();
-        for (int i = 0; i < BoundedStack.capacity; i++) {
-            full.add("seacrh"+i);             
+        for (int i = 0; i < full.getCapacity(); i++) {
+            full.add("search"+i);             
         }
-        check("can fill up to capacity", full.size() == BoundedStack.capacity);//สามารถเติมจนเต็ม capacity
+        check("can fill up to capacity", full.size() == full.getCapacity());//สามารถเติมจนเต็ม capacity
         check("add when full -> returns false", !full.add("one more"));//เพิ่มเมื่อมีขนาดเต็มจะส่ง false กลับ
     }
 
@@ -140,7 +143,7 @@ public class BoundedStackTest{
         check("remove -> search is gone", !b.contains("1+5"));//คำค้นหานี้ไม่ได้อยู่ในรายการ
         check("remove keeps the others in order",b.searchs().equals(Arrays.asList("X", "พ่อ")));//ยังมีรายการที่เรายังไม่เหลืออยู่
 
-        // ลบารายการที่ไม่มีไม่ใช่ error คืน false
+        // ลบรายการที่ไม่มีไม่ใช่ error คืน false
         check("remove missing song -> returns false", !b.remove("J3k"));//ลบคำที่ไมมีอยู่ในรายการ
 
         // boundary: ลบจนหมด
