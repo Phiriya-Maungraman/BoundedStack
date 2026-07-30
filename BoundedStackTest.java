@@ -60,24 +60,53 @@ public class BoundedStackTest{
         check("new(list) -> contains X", b.contains("X"));
         check("new(list) -> preserves order",
                 b.searchs().equals(Arrays.asList("X", "1+5", "พ่อ")));
+        
 
 
-        boolean threwDup = false;
+        boolean threwDup = false; //คำซ้ำ
         try {
             new BoundedStack(Arrays.asList("X", "X"));
         } catch (IllegalArgumentException e) {
             threwDup = true;
         }
+        check("new(duplicates) -> throws IllegalArgumentException" , threwDup);
 
+        boolean threwNull = false; //คำเป็น Null
+        try{
+            new BoundedStack(Arrays.asList("X",null));
+        } catch (IllegalArgumentException e) {
+            threwNull = true;
+        }
+        check("new(list with null) -> throws IllegalArgumentException", threwNull);
 
-        
+        boolean threwnullList = false; //ลิสต์เป็น null
+        try{
+            new BoundedStack(null);
+        } catch (IllegalArgumentException e){
+            threwnullList = true;
+        }
+        check("new(null) -> throws IllegalArgumentException", threwnullList);
 
-        
+    }
+      // --- Mutator: add ต้องรักษาลำดับและเพลงซ้ำต้องลบแล้วไปอยุ่ล่าสุด ---
+    private static void testAdd(){
+        System.out.println("\n-- Add --");
+        BoundedStack b = new BoundedStack();
+        check("add(X)-> returns true", b.add("X"));//ตรวจสอบเพิ่มรายการค้นหา X สำเร็จไหม
+        check("add(X) -> size 1", b.size()==1);//ตรวจสอบการค้นหามี 1 รายการไหม
+        check("add(X) -> found by contains", b.contains("X"));//ตรวจสอบมีคำค้นหา X ไหม
+        b.add("1+5");
+        b.add("พ่อ");
+        check("add preserves insertion order",
+            b.searchs().equals(Arrays.asList("พ่อ","1+5","X")));//คำค้นหาใหม่จะอยู่ด้านหน้า
+        b.add("1+5");
+        check("add preserves insertion order",
+            b.searchs().equals(Arrays.asList("1+5","พ่อ","X")));//คำค้นหาซ้ำต้องถูกลบแล้วเลื่อนไปอยู่หน้าสุด
+        check("dupiclate search no size changed", b.size() == 3);//คำค้นหาซ้ำมีขนาดเท่าเดิม
 
 
 
     }
-    private static void testAdd(){}
     private static void testRemove(){}
     private static void testObservers(){}
     private static void testProducer(){}
